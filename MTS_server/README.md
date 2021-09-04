@@ -1,6 +1,6 @@
 #### 运行前准备
-- 导入[DiseaseKG:基于cnSchma常见疾病信息知识图谱](http://www.openkg.cn/dataset/disease-information)
-- 修改 config.py 中的 NEO4J_CONFIG
+- 导入[DiseaseKG:基于cnSchma常见疾病信息知识图谱](http://www.openkg.cn/dataset/disease-information)（用户名：neo4j，密码：123456）
+- 确认 config.py 中的 NEO4J_CONFIG（主要是端口号）
 - 安装 gunicorn（用来运行和管理Flask）
 #### 以Flask项目形式启动
 - 启动后台服务，终端运行：gunicorn -w 1 -b 127.0.0.1:5000 main_server:app --log-level debug
