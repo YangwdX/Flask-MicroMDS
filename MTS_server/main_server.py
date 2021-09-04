@@ -83,7 +83,7 @@ def main_serve():
     diseases = query_neo4j(symptoms)
     print(f"\033[;36mdiseases: \033[0m{diseases.keys()}")
     print("\n\n")
-    return str(diseases)
+    return str(diseases.keys())
 
 
 if __name__ == '__main__':
