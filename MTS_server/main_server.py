@@ -14,20 +14,31 @@ neo4j_symptoms = txt2list("./dict/symptom.txt")
 flask_mode = True
 
 
+# 获取与文字描述最相似的症状
+def get_similar_sysptom(desc):
+    result = ["腹痛", "鼻塞"]
+    print(f"\033[;36m  symptoms_des: \033[0m{desc} \033[;36m  symptoms_res: \033[0m{result}")
+    return result
+
+
 # 处理用户症状选择或文字输入
 def description_process(type, description):
     if not type:  # 类型0，症状选择
         symptoms = description.split(",")
     else:  # 类型1，文字输入
         symptoms = []
-        jieba_lcut = jieba.lcut(description)
-        print(f"\033[;36mjieba_lcut: \033[0m{jieba_lcut}")
-        for item in jieba_lcut:
-            if item in neo4j_symptoms:
-                symptoms.append(item)
-            elif len(item) >= 2:
-                pass
-    symptoms = sorted(set(symptoms), key=symptoms.index)  # 去除重复项
+        description_list = description.replace("，", ",").split(",")
+        print(f"\033[;35mdescription_list: \033[0m{description_list}")
+        for desc in description_list:
+            flag = False  # 判断当前症状描述是否能直接映射到知识图谱中
+            jieba_lcut = jieba.lcut(desc)
+            for item in jieba_lcut:
+                if item in neo4j_symptoms:
+                    flag = True
+                    symptoms.append(item)
+            if not flag and len(desc) >= 2:
+                symptoms.extend(get_similar_sysptom(desc))
+        symptoms = sorted(set(symptoms), key=symptoms.index)  # 去除重复项
     return symptoms
 
 
@@ -50,7 +61,7 @@ def get_symptoms_list(symptoms):
 def query_neo4j(symptoms):
     # 构造症状List
     symptoms_list = get_symptoms_list(symptoms)
-    print(f"\033[;36msymptoms_list: \033[0m{symptoms_list}")
+    # print(f"\033[;35msymptoms_list: \033[0m{symptoms_list}")
 
     # 基于症状List查询图数据库
     for symptoms in symptoms_list:
@@ -68,7 +79,7 @@ def query_neo4j(symptoms):
             keys = list(map(lambda disease: disease["name"], result))
             result = dict(zip(keys, result))
             if result:  # symptoms_list中前面的item优先级高，如果查询到结果就返回
-                print(f"\033[;36mquery_symptoms: \033[0m{symptoms}")
+                print(f"\033[;35mquery_symptoms: \033[0m{symptoms}")
                 return result
     return None
 
@@ -81,23 +92,23 @@ def main_serve():
     else:
         type = 1
         # description = "鼻塞情绪性感冒"
-        description = "肚子有点疼手臂使不上劲鼻塞情绪性感冒傻逼玩意鼻塞咳嗽"
+        description = "肚子有点疼,手臂使不上劲，情绪性感冒,傻逼玩意,，咳嗽"
         # description = "这是一个无效的症状描述！"
-    print(f"\033[;36mdescription: \033[0m{description}")
+    print(f"\033[;35mdescription: \033[0m{description}")
     # 判断当前pipeline的结果是否符合预期（description非空）
     if not description:
         print(error_code_description[1], end="\n\n")
         return {1: error_code_description[1]}
 
     symptoms = description_process(type, description)
-    print(f"\033[;36msymptoms: \033[0m{symptoms}")
+    print(f"\033[;35msymptoms: \033[0m{symptoms}")
     # 判断当前pipeline的结果是否符合预期（symptoms非空）
     if not symptoms:
         print(error_code_description[2], end="\n\n")
         return {2: error_code_description[2]}
 
     diseases = query_neo4j(symptoms)
-    print(f"\033[;36mdiseases: \033[0m{diseases.keys()}")
+    print(f"\033[;35mdiseases: \033[0m{diseases.keys()}")
     # 判断当前pipeline的结果是否符合预期（diseases非空）
     if not diseases:
         print(error_code_description[3], end="\n\n")
