@@ -81,7 +81,7 @@ def main_serve():
     else:
         type = 1
         # description = "鼻塞情绪性感冒"
-        description = "鼻塞情绪性感冒傻逼玩意鼻塞咳嗽"
+        description = "肚子有点疼手臂使不上劲鼻塞情绪性感冒傻逼玩意鼻塞咳嗽"
         # description = "这是一个无效的症状描述！"
     print(f"\033[;36mdescription: \033[0m{description}")
     # 判断当前pipeline的结果是否符合预期（description非空）
